@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Steam Motor - Laporan Keuangan</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
+    padding:20px;
+}
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    color:black;
+    padding:20px;
+    border-radius:10px;
+}
+h1{text-align:center;}
+select,input,button{
+    padding:8px;
+    margin:5px;
+}
+button{
+    background:#2c5364;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+button:hover{background:#203a43;}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+.summary{
+    margin-top:20px;
+    font-size:18px;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>📊 Steam Motor - Laporan Keuangan</h1>
+
+<input type="date" id="tanggal">
+
+<select id="jenisMotor">
+    <option value="Metic">Metic</option>
+    <option value="Rantai">Rantai</option>
+</select>
+
+<select id="ukuran">
+    <option value="Kecil">Kecil</option>
+    <option value="Sedang">Sedang</option>
+    <option value="Besar">Besar</option>
+</select>
+
+<select id="jenisCuci">
+    <option value="Biasa">Biasa</option>
+    <option value="Premium">Premium</option>
+</select>
+
+<button onclick="tambahData()">Tambah</button>
+<button onclick="resetData()">Reset Semua</button>
+
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Tanggal</th>
+<th>Motor</th>
+<th>Ukuran</th>
+<th>Cuci</th>
+<th>Harga</th>
+</tr>
+</thead>
+<tbody id="dataTable"></tbody>
+</table>
+
+<div class="summary">
+Total Hari Ini: Rp <span id="totalHarian">0</span><br>
+Total Bulan Ini: Rp <span id="totalBulanan">0</span>
+</div>
+
+</div>
+
+<script>
+
+let dataTransaksi = [];
+let nomor = 1;
+
+const hargaList = {
+    "Metic-Kecil-Biasa":20000,
+    "Metic-Kecil-Premium":30000,
+    "Metic-Sedang-Biasa":23000,
+    "Metic-Sedang-Premium":30000,
+    "Metic-Besar-Biasa":25000,
+    "Metic-Besar-Premium":35000,
+    "Rantai-Kecil-Biasa":23000,
+    "Rantai-Kecil-Premium":30000,
+    "Rantai-Sedang-Biasa":27000,
+    "Rantai-Sedang-Premium":30000,
+    "Rantai-Besar-Biasa":35000,
+    "Rantai-Besar-Premium":40000
+};
+
+function tambahData(){
+    let tanggal = document.getElementById("tanggal").value;
+    if(!tanggal){
+        alert("Pilih tanggal dulu!");
+        return;
+    }
+
+    let jenisMotor = document.getElementById("jenisMotor").value;
+    let ukuran = document.getElementById("ukuran").value;
+    let jenisCuci = document.getElementById("jenisCuci").value;
+
+    let key = `${jenisMotor}-${ukuran}-${jenisCuci}`;
+    let harga = hargaList[key];
+
+    dataTransaksi.push({tanggal, harga});
+
+    let table = document.getElementById("dataTable");
+    let row = table.insertRow();
+
+    row.insertCell(0).innerHTML = nomor++;
+    row.insertCell(1).innerHTML = tanggal;
+    row.insertCell(2).innerHTML = jenisMotor;
+    row.insertCell(3).innerHTML = ukuran;
+    row.insertCell(4).innerHTML = jenisCuci;
+    row.insertCell(5).innerHTML = "Rp " + harga.toLocaleString("id-ID");
+
+    hitungLaporan();
+}
+
+function hitungLaporan(){
+    let today = new Date().toISOString().split('T')[0];
+    let thisMonth = today.substring(0,7);
+
+    let totalHarian = 0;
+    let totalBulanan = 0;
+
+    dataTransaksi.forEach(item=>{
+        if(item.tanggal === today){
+            totalHarian += item.harga;
+        }
+        if(item.tanggal.startsWith(thisMonth)){
+            totalBulanan += item.harga;
+        }
+    });
+
+    document.getElementById("totalHarian").innerText =
+        totalHarian.toLocaleString("id-ID");
+
+    document.getElementById("totalBulanan").innerText =
+        totalBulanan.toLocaleString("id-ID");
+}
+
+function resetData(){
+    dataTransaksi = [];
+    nomor = 1;
+    document.getElementById("dataTable").innerHTML = "";
+    document.getElementById("totalHarian").innerText = "0";
+    document.getElementById("totalBulanan").innerText = "0";
+}
+
+document.getElementById("tanggal").value =
+    new Date().toISOString().split('T')[0];
+
+</script>
+
+</body>
+</html>
